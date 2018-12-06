@@ -10,14 +10,14 @@ module.exports = {
       //console.log('#######2', res);
       let queryString = `SELECT chats.id,users.name,messages.message,rooms.room,chats.createdAt FROM chats,users,messages,rooms 
       WHERE chats.userId = users.id AND chats.messageId = messages.id  
-      AND chats.roomId=rooms.id;`;
+      AND chats.roomId=rooms.id ORDER BY chats.id DESC;`;
       dbConnection.query(queryString, function (err, results) {
         if (err) {
           console.log(err);
         } else {
           //console.log('@@@@@@@@@@@', results[0].message);
           console.log('@@@@@@@@@@@@@ GET results:  ', { results });
-          sendResponse(res, { results });
+          sendResponse(res, { results }, 200);
         }
       });
 
@@ -29,11 +29,11 @@ module.exports = {
       console.log('---THE MESSAGE POST REQUEST BODY: ', req.body);
 
       dbConnection.query(`INSERT INTO users(name) VALUES ('${req.body.name}');`, (err) => { });
-      dbConnection.query(`INSERT INTO rooms(room) VALUES (${JSON.stringify(req.body.roomname)});`);
+      dbConnection.query(`INSERT INTO rooms(room) VALUES (${JSON.stringify(req.body.room)});`, (err) => { });
       dbConnection.query(`INSERT INTO messages(message) VALUES (${JSON.stringify(req.body.message)});`);
       dbConnection.query(`INSERT INTO chats(userId,roomId,messageId,createdAt) VALUES 
                 ((SELECT id FROM users WHERE name=${JSON.stringify(req.body.name)}),
-                (SELECT id FROM rooms WHERE room=${JSON.stringify(req.body.roomname)}),
+                (SELECT id FROM rooms WHERE room=${JSON.stringify(req.body.room)}),
                 (SELECT id FROM messages WHERE message=${JSON.stringify(req.body.message)}),
                 CURRENT_TIMESTAMP);`);
       sendResponse(res, null, 201);

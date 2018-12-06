@@ -29,9 +29,9 @@ var RoomsView = {
   },
 
   handleClick: function (event) {
-    var roomname = prompt('Enter room name');
-    if (roomname) {
-      Rooms.add(roomname, () => {
+    var room = prompt('Enter room name');
+    if (room) {
+      Rooms.add(room, () => {
         RoomsView.render();
         MessagesView.render();
       });
