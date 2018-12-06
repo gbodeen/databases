@@ -40,17 +40,15 @@ describe('Persistent Node Chat Server', function () {
       json: { name: 'Dan' }
     }, function () {
       // Post a message to the node chat server:
-      console.log('%%%%%%%%%%%%%%1');
       request({
         method: 'POST',
         uri: 'http://127.0.0.1:3000/classes/messages',
         json: {
           name: 'Valjean',
           message: 'In mercy\'s name, three days is all I need.',
-          roomname: 'Hello'
+          room: 'Hello'
         }
       }, function () {
-        console.log('%%%%%%%%%%%%%%2');
         // Now if we look in the database, we should find the
         // posted message there.
 
@@ -67,10 +65,8 @@ describe('Persistent Node Chat Server', function () {
           // if (err) {
           //   console.log('{}{}{}{}{}{}{}{}', err);
           // }
-          // Should have one result:
-          expect(results.length).to.equal(1);
 
-          console.log('SPEC select after POST:', results);
+          expect(results.length).to.equal(1);
 
           // TODO: If you don't have a column named message, change this test.
           expect(results[0].message).to.equal('In mercy\'s name, three days is all I need.');
@@ -90,7 +86,7 @@ describe('Persistent Node Chat Server', function () {
       json: {
         name: 'Jean',
         message: 'Men like you can never change!',
-        roomname: 'main'
+        room: 'main'
       }
     });
 
@@ -101,13 +97,12 @@ describe('Persistent Node Chat Server', function () {
     // them up to you. */
 
     dbConnection.query(queryString, queryArgs, function (err) {
-      if (err) { throw err; }
+      if (err) { console.log('error with spec query sending/receiving'); }
 
       // Now query the Node chat server and see if it returns
       // the message we just inserted:
       request('http://127.0.0.1:3000/classes/messages', function (error, response, body) {
-        var messageLog = JSON.parse(response.body);
-        console.log('++++++++++++++', messageLog);
+        var messageLog = JSON.parse(response.body).results;
         expect(messageLog[0].message).to.equal('Men like you can never change!');
         expect(messageLog[0].room).to.equal('main');
         done();

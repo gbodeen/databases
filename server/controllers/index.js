@@ -15,8 +15,7 @@ module.exports = {
         if (err) {
           console.log(err);
         } else {
-          //console.log('@@@@@@@@@@@', results[0].message);
-          console.log('@@@@@@@@@@@@@ GET results:  ', { results });
+          //console.log('@@@@@@@@@@@@@ GET results:  ', { results });
           sendResponse(res, { results }, 200);
         }
       });
@@ -49,7 +48,7 @@ module.exports = {
 
     },
     post: function (req, res) {
-      console.log('THE USER POST REQUEST BODY: ', req.body);
+      //console.log('THE USER POST REQUEST BODY: ', req.body);
 
       let queryString = `INSERT INTO users (name) VALUES (${JSON.stringify(req.body.name)});`;
       dbConnection.query(queryString, function (err, results) {
