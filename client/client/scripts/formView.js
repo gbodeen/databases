@@ -12,9 +12,9 @@ var FormView = {
 
 
     var message = {
-      username: App.username,
-      text: FormView.$form.find('#message').val(),
-      roomname: Rooms.selected || 'lobby'
+      name: App.name,
+      message: FormView.$form.find('#message').val(),
+      room: Rooms.selected || 'lobby'
     };
 
     Parse.create(message, (data) => {

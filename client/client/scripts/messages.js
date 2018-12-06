@@ -3,16 +3,16 @@ var Messages = {
 
   _data: {},
 
-  items: function() {
+  items: function () {
     return _.chain(Object.values(Messages._data)).sortBy('createdAt');
   },
 
-  add: function(message, callback = ()=>{}) {
+  add: function (message, callback = () => { }) {
     Messages._data[message.objectId] = message;
     callback(Messages.items());
   },
 
-  update: function(messages, callback = ()=>{}) {
+  update: function (messages, callback = () => { }) {
     var length = Object.keys(Messages._data).length;
 
     for (let message of messages) {
@@ -25,12 +25,12 @@ var Messages = {
     }
   },
 
-  _conform: function(message) {
+  _conform: function (message) {
     // ensure each message object conforms to expected shape
-    message.text = message.text || '';
-    message.username = message.username || '';
-    message.roomname = message.roomname || '';
+    message.message = message.message || '';
+    message.name = message.name || '';
+    message.room = message.room || '';
     return message;
   }
-  
+
 };

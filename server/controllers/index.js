@@ -15,8 +15,9 @@ module.exports = {
         if (err) {
           console.log(err);
         } else {
-          console.log('@@@@@@@@@@@', results);
-          sendResponse(res, results);
+          //console.log('@@@@@@@@@@@', results[0].message);
+          console.log('@@@@@@@@@@@@@ GET results:  ', { results });
+          sendResponse(res, { results });
         }
       });
 
@@ -27,14 +28,15 @@ module.exports = {
 
       console.log('---THE MESSAGE POST REQUEST BODY: ', req.body);
 
-      //dbConnection.query(`INSERT INTO users(name) VALUES ('${req.body.username}');`);
+      dbConnection.query(`INSERT INTO users(name) VALUES ('${req.body.name}');`, (err) => { });
       dbConnection.query(`INSERT INTO rooms(room) VALUES (${JSON.stringify(req.body.roomname)});`);
       dbConnection.query(`INSERT INTO messages(message) VALUES (${JSON.stringify(req.body.message)});`);
       dbConnection.query(`INSERT INTO chats(userId,roomId,messageId,createdAt) VALUES 
-                ((SELECT id FROM users WHERE name=${JSON.stringify(req.body.username)}),
+                ((SELECT id FROM users WHERE name=${JSON.stringify(req.body.name)}),
                 (SELECT id FROM rooms WHERE room=${JSON.stringify(req.body.roomname)}),
                 (SELECT id FROM messages WHERE message=${JSON.stringify(req.body.message)}),
                 CURRENT_TIMESTAMP);`);
+      sendResponse(res, null, 201);
     }, // a function which handles posting a message to the database
     options: function (req, res) {
       sendResponse(res, null);
@@ -49,7 +51,7 @@ module.exports = {
     post: function (req, res) {
       console.log('THE USER POST REQUEST BODY: ', req.body);
 
-      let queryString = `INSERT INTO users (name) VALUES (${JSON.stringify(req.body.username)});`;
+      let queryString = `INSERT INTO users (name) VALUES (${JSON.stringify(req.body.name)});`;
       dbConnection.query(queryString, function (err, results) {
         if (err) {
           console.log('--- User POST got an error: ', err);

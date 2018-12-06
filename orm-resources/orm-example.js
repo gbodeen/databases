@@ -5,13 +5,13 @@
 
 var Sequelize = require('sequelize');
 var db = new Sequelize('chatter', 'root', '');
-/* TODO this constructor takes the database name, username, then password.
+/* TODO this constructor takes the database name, name, then password.
  * Modify the arguments if you need to */
 
 /* first define the data structure by giving property names and datatypes
  * See http://sequelizejs.com for other datatypes you can use besides STRING. */
 var User = db.define('User', {
-  username: Sequelize.STRING
+  name: Sequelize.STRING
 });
 
 var Message = db.define('Message', {
@@ -25,15 +25,15 @@ var Message = db.define('Message', {
 User.sync()
   .then(function() {
     // Now instantiate an object and save it:
-    return User.create({username: 'Jean Valjean'});
+    return User.create({name: 'Jean Valjean'});
   })
   .then(function() {
     // Retrieve objects from the database:
-    return User.findAll({ where: {username: 'Jean Valjean'} });
+    return User.findAll({ where: {name: 'Jean Valjean'} });
   })
   .then(function(users) {
     users.forEach(function(user) {
-      console.log(user.username + ' exists');
+      console.log(user.name + ' exists');
     });
     db.close();
   })
