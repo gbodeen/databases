@@ -20,10 +20,12 @@ describe('Persistent Node Chat Server', function () {
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
-    dbConnection.query(`TRUNCATE TABLE users; 
-    TRUNCATE TABLE messages;
-    TRUNCATE TABLE rooms;
-    TRUNCATE TABLE chats;`, done);
+    dbConnection.query('SET FOREIGN_KEY_CHECKS = 0;');
+    dbConnection.query('TRUNCATE TABLE chats;');
+    dbConnection.query('TRUNCATE TABLE users;');
+    dbConnection.query('TRUNCATE TABLE messages;');
+    dbConnection.query('TRUNCATE TABLE rooms;');
+    dbConnection.query('SET FOREIGN_KEY_CHECKS = 1;', done);
   });
 
   afterEach(function () {
@@ -52,12 +54,17 @@ describe('Persistent Node Chat Server', function () {
 
         // TODO: You might have to change this test to get all the data from
         // your message table, since this is schema-dependent.
-        var queryString = 'SELECT message FROM messages WHERE user = "Valjean"';
+        var queryString = `SELECT message FROM messages 
+        INNER JOIN chats ON chats.messageId = messages.id
+        INNER JOIN users ON chats.userId = users.id
+        WHERE users.name = 'Valjean'`;
         var queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, function (err, results) {
           // Should have one result:
           expect(results.length).to.equal(1);
+
+          console.log('SPEC select after POST:', results);
 
           // TODO: If you don't have a column named message, change this test.
           expect(results[0].message).to.equal('In mercy\'s name, three days is all I need.');

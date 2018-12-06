@@ -1,5 +1,6 @@
 var models = require('../models');
 var dbConnection = require('../db/index.js').dbConnection;
+dbConnection.connect();
 // console.log('************', dbConnection);
 
 module.exports = {
@@ -7,17 +8,16 @@ module.exports = {
     get: function (req, res) {
       //console.log('#######1', req);
       //console.log('#######2', res);
-      let queryString = 'SELECT * FROM chats;';
-      dbConnection.connect(err => {
-        dbConnection.query(queryString, function (err, results) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log('@@@@@@@@@@@', results);
-          }
-          dbConnection.end();
-
-        });
+      let queryString = `SELECT chats.id,users.name,messages.message,rooms.room,chats.createdAt FROM chats,users,messages,rooms 
+      WHERE chats.userId = users.id AND chats.messageId = messages.id  
+      AND chats.roomId=rooms.id;`;
+      dbConnection.query(queryString, function (err, results) {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('@@@@@@@@@@@', results);
+          sendResponse(res, results);
+        }
       });
 
 
@@ -25,6 +25,16 @@ module.exports = {
     }, // a function which handles a get request for all messages
     post: function (req, res) {
 
+      console.log('---THE MESSAGE POST REQUEST BODY: ', req.body);
+
+      //dbConnection.query(`INSERT INTO users(name) VALUES ('${req.body.username}');`);
+      dbConnection.query(`INSERT INTO rooms(room) VALUES (${JSON.stringify(req.body.roomname)});`);
+      dbConnection.query(`INSERT INTO messages(message) VALUES (${JSON.stringify(req.body.message)});`);
+      dbConnection.query(`INSERT INTO chats(userId,roomId,messageId,createdAt) VALUES 
+                ((SELECT id FROM users WHERE name=${JSON.stringify(req.body.username)}),
+                (SELECT id FROM rooms WHERE room=${JSON.stringify(req.body.roomname)}),
+                (SELECT id FROM messages WHERE message=${JSON.stringify(req.body.message)}),
+                CURRENT_TIMESTAMP);`);
     }, // a function which handles posting a message to the database
     options: function (req, res) {
       sendResponse(res, null);
@@ -33,8 +43,23 @@ module.exports = {
 
   users: {
     // Ditto as above
-    get: function (req, res) { },
-    post: function (req, res) { },
+    get: function (req, res) {
+
+    },
+    post: function (req, res) {
+      console.log('THE USER POST REQUEST BODY: ', req.body);
+
+      let queryString = `INSERT INTO users (name) VALUES (${JSON.stringify(req.body.username)});`;
+      dbConnection.query(queryString, function (err, results) {
+        if (err) {
+          console.log('--- User POST got an error: ', err);
+        } else {
+          // console.log('@@@@@@@@@@@', results);
+          sendResponse(res, null, 201);
+        }
+
+      });
+    },
     options: function (req, res) {
       sendResponse(res, null);
     }
